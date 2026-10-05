@@ -37,17 +37,13 @@ namespace bit_manip {
     void SetBit(uint8_t& data, size_t bit, bool value);
 }
 
+namespace branch_instructions {
+    void Branch(int8_t& pc, int8_t memory, bool condition);
+}
+
 namespace flag_instructions {
-    void ClearCarry(uint8_t& status);
-    void SetCarry(uint8_t& status);
-
-    void ClearInterruptDisable(uint8_t& status);
-    void SetInterruptDisable(uint8_t& status);
-
-    void ClearDecimal(uint8_t& status);
-    void SetDecimal(uint8_t& status);
-    
-    void ClearOverflow(uint8_t& status);
+    void ClearFlag(uint8_t& status, StatusFlag flag);
+    void SetFlag(uint8_t& status, StatusFlag flag);
 }
 
 namespace transfer_instructions {
