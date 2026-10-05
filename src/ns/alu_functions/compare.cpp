@@ -1,14 +1,14 @@
 #include <components/cpu.h>
 #include <ns.h>
 
-ALUresult alu_functions::compare::Compare(uint8_t value, uint8_t memory) {
+ALUresult alu_functions::compare::Compare(uint8_t reg, uint8_t memory) {
     uint8_t result{static_cast<uint8_t>(
-        value - memory
+        reg - memory
     )};
 
     uint8_t status{};
-    bit_manip::SetBit(status, CARRY, value >= memory);
-    bit_manip::SetBit(status, ZERO, value == memory);
+    bit_manip::SetBit(status, CARRY, reg >= memory);
+    bit_manip::SetBit(status, ZERO, reg == memory);
     bit_manip::SetBit(status, NEGATIVE, bit_manip::BitSet(result, 7));
 
     return ALUresult{

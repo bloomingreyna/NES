@@ -2,10 +2,16 @@
 
 struct ALUresult;
 
+namespace access_instructions {
+    void Load(uint8_t& reg, uint8_t& status, uint8_t memory);
+    void Store(uint8_t reg, uint8_t& memory);
+}
+
 namespace alu_functions {
     namespace arithmetic {
         // Internally, SBC is implemented via ADC and inverting the memory.
         ALUresult AddWithCarry(uint8_t accumulator, uint8_t memory, bool carry);
+        
         ALUresult Increment(uint8_t memory);
         ALUresult Decrement(uint8_t memory);
     }
@@ -16,7 +22,7 @@ namespace alu_functions {
         ALUresult BitTest(uint8_t accumulator, uint8_t memory);
     }
     namespace compare {
-        ALUresult Compare(uint8_t value, uint8_t memory);
+        ALUresult Compare(uint8_t reg, uint8_t memory);
     }
     namespace shift {
         ALUresult ArithmeticShiftLeft(uint8_t value);
