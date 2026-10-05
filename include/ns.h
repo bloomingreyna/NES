@@ -11,7 +11,7 @@ namespace alu_functions {
     namespace arithmetic {
         // Internally, SBC is implemented via ADC and inverting the memory.
         ALUresult AddWithCarry(uint8_t accumulator, uint8_t memory, bool carry);
-        
+
         ALUresult Increment(uint8_t memory);
         ALUresult Decrement(uint8_t memory);
     }
@@ -32,6 +32,11 @@ namespace alu_functions {
     }
 }
 
+namespace bit_manip {
+    bool BitSet(uint8_t data, size_t bit);
+    void SetBit(uint8_t& data, size_t bit, bool value);
+}
+
 namespace flag_instructions {
     void ClearCarry(uint8_t& status);
     void SetCarry(uint8_t& status);
@@ -45,7 +50,6 @@ namespace flag_instructions {
     void ClearOverflow(uint8_t& status);
 }
 
-namespace bit_manip {
-    bool BitSet(uint8_t data, size_t bit);
-    void SetBit(uint8_t& data, size_t bit, bool value);
+namespace transfer_instructions {
+    void Transfer(uint8_t src_reg, uint8_t& dest_reg, uint8_t& status);
 }

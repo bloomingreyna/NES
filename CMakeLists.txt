@@ -27,8 +27,9 @@ PRIVATE
     src/ns/alu_functions/bitwise.cpp
     src/ns/alu_functions/shift.cpp
     src/ns/alu_functions/compare.cpp
-    src/ns/flag_instructions.cpp
-    src/ns/access_instructions.cpp
+    src/ns/instructions/flag_instructions.cpp
+    src/ns/instructions/access_instructions.cpp
+    src/ns/instructions/transfer_instructions.cpp
 )
 
 target_include_directories(rbes
