@@ -48,9 +48,23 @@ namespace flag_instructions {
     void SetFlag(uint8_t& status, StatusFlag flag);
 }
 
+namespace jump_instructions {
+    void Jump(uint16_t& program_counter, uint16_t memory);
+    void JumpToSubroutine(uint16_t& program_counter, uint16_t memory, uint8_t& stack_value_high, uint8_t& stack_value_low, uint8_t& stack_pointer);
+    
+    void ReturnFromSubroutine(uint16_t& program_counter, uint8_t stack_value_high, uint8_t stack_value_low, uint8_t& stack_pointer);
+
+    void Break(); // Bullshit interrupt stuff
+
+    
+}
+
 namespace stack_instructions {
-    void Push(uint8_t& stack_value, uint8_t& stack_pointer, uint8_t reg);
-    void Pull(uint8_t stack_value, uint8_t& stack_pointer, uint8_t& reg);
+    void PushA(uint8_t& stack_value, uint8_t& stack_pointer, uint8_t a);
+    void PullA(uint8_t stack_value, uint8_t& stack_pointer, uint8_t& a);
+
+    void PushStatus(uint8_t& stack_value, uint8_t& stack_pointer, uint8_t status);
+    void PullStatus(uint8_t stack_value, uint8_t& stack_pointer, uint8_t& status);
 
     void TransferX(uint8_t& stack_pointer, uint8_t x);
 }

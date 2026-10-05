@@ -32,6 +32,7 @@ PRIVATE
     src/ns/instructions/transfer_instructions.cpp
     src/ns/instructions/branch_instructions.cpp
     src/ns/instructions/stack_instructions.cpp
+    src/ns/instructions/jump_instructions.cpp
 )
 
 target_include_directories(rbes
