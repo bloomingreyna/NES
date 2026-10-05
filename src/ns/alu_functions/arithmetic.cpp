@@ -1,11 +1,12 @@
-#include <array>
-
 #include <components/cpu.h>
 #include <ns.h>
 
 ALUresult alu_functions::arithmetic::AddWithCarry(uint8_t accumulator, uint8_t memory, bool carry) {
-    uint16_t result{static_cast<uint8_t>(carry)};
-    result += static_cast<uint16_t>(accumulator) + static_cast<uint16_t>(memory);
+    uint16_t result{static_cast<uint16_t>(
+        static_cast<uint16_t>(carry) +
+        static_cast<uint16_t>(accumulator) +
+        static_cast<uint16_t>(memory)
+    )};
 
     uint8_t status{};
     bit_manip::SetBit(status, CARRY, result > 0xFF);
@@ -21,7 +22,9 @@ ALUresult alu_functions::arithmetic::AddWithCarry(uint8_t accumulator, uint8_t m
 }
 
 ALUresult alu_functions::arithmetic::Increment(uint8_t memory) {
-    uint16_t result{static_cast<uint16_t>(static_cast<uint16_t>(memory) + 1)};
+    uint16_t result{static_cast<uint16_t>(
+        static_cast<uint16_t>(memory) + 1
+    )};
 
     uint8_t status{};
     bit_manip::SetBit(status, ZERO, (result & 0xFF) == 0);
@@ -35,7 +38,9 @@ ALUresult alu_functions::arithmetic::Increment(uint8_t memory) {
 }
 
 ALUresult alu_functions::arithmetic::Decrement(uint8_t memory) {
-    uint16_t result{static_cast<uint16_t>(static_cast<uint16_t>(memory) - 1)};
+    uint16_t result{static_cast<uint16_t>(
+        static_cast<uint16_t>(memory) - 1
+    )};
 
     uint8_t status{};
     bit_manip::SetBit(status, ZERO, (result & 0xFF) == 0);

@@ -25,6 +25,8 @@ PRIVATE
     src/ns/bit_manip.cpp
     src/ns/alu_functions/arithmetic.cpp
     src/ns/alu_functions/bitwise.cpp
+    src/ns/alu_functions/shift.cpp
+    src/ns/alu_functions/compare.cpp
 )
 
 target_include_directories(rbes

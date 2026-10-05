@@ -15,6 +15,15 @@ namespace alu_functions {
         ALUresult XOR(uint8_t accumulator, uint8_t memory);
         ALUresult BitTest(uint8_t accumulator, uint8_t memory);
     }
+    namespace compare {
+        ALUresult Compare(uint8_t value, uint8_t memory);
+    }
+    namespace shift {
+        ALUresult ArithmeticShiftLeft(uint8_t value);
+        ALUresult LogicalShiftRight(uint8_t value);
+        ALUresult RotateLeft(uint8_t value, bool carry);
+        ALUresult RotateRight(uint8_t value, bool carry);
+    }
 }
 
 namespace bit_manip {
