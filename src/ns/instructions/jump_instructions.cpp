@@ -17,6 +17,14 @@ void jump_instructions::ReturnFromSubroutine(uint16_t& program_counter, uint8_t 
     stack_pointer += 2;
 }
 
+void jump_instructions::ReturnFromInterrupt(uint16_t& program_counter, uint8_t& status, bool& service_interrupts, uint8_t stack_value_high, uint8_t stack_value_low, uint8_t stack_value_status, uint8_t& stack_pointer) {
+    program_counter = (stack_value_high << 8) | stack_value_low;
+    status = (stack_value_status & 0b11001111) | (status & 0b00110000);
+    stack_pointer += 3;
+
+    service_interrupts = !bit_manip::BitSet(status, INTERRUPT_DISABLE);
+}
+
 void jump_instructions::Break(uint16_t& program_counter, uint8_t& status, bool& service_interrupts, uint8_t& stack_value_high, uint8_t& stack_value_low, uint8_t& stack_value_status, uint8_t& stack_pointer) {
     stack_value_high = program_counter >> 8;
     stack_value_low = program_counter & 0xFF;

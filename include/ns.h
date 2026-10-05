@@ -57,6 +57,7 @@ namespace jump_instructions {
     void JumpToSubroutine(uint16_t& program_counter, uint16_t memory, uint8_t& stack_value_high, uint8_t& stack_value_low, uint8_t& stack_pointer);
     
     void ReturnFromSubroutine(uint16_t& program_counter, uint8_t stack_value_high, uint8_t stack_value_low, uint8_t& stack_pointer);
+    void ReturnFromInterrupt(uint16_t& program_counter, uint8_t& status, bool& service_interrupts, uint8_t stack_value_high, uint8_t stack_value_low, uint8_t stack_value_status, uint8_t& stack_pointer);
 
     void Break(uint16_t& program_counter, uint8_t& status, bool& service_interrupts, uint8_t& stack_value_high, uint8_t& stack_value_low, uint8_t& stack_value_status, uint8_t& stack_pointer);
 }
