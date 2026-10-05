@@ -38,7 +38,7 @@ namespace bit_manip {
 }
 
 namespace branch_instructions {
-    void Branch(int8_t& pc, int8_t memory, bool condition);
+    void Branch(uint16_t& pc, int8_t memory, bool condition);
 }
 
 namespace flag_instructions {
