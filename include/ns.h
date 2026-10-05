@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <queue>
 
 #include <components/cpu.h>
 
@@ -46,6 +47,9 @@ namespace branch_instructions {
 namespace flag_instructions {
     void ClearFlag(uint8_t& status, StatusFlag flag);
     void SetFlag(uint8_t& status, StatusFlag flag);
+
+    void ClearInterruptDisable(uint8_t& status, InterruptServiceDelay& isd);
+    void SetInterruptDisable(uint8_t& status, InterruptServiceDelay& isd);
 }
 
 namespace jump_instructions {
@@ -54,9 +58,7 @@ namespace jump_instructions {
     
     void ReturnFromSubroutine(uint16_t& program_counter, uint8_t stack_value_high, uint8_t stack_value_low, uint8_t& stack_pointer);
 
-    void Break(); // Bullshit interrupt stuff
-
-    
+    void Break(uint16_t& program_counter, uint8_t& status, bool& service_interrupts, uint8_t& stack_value_high, uint8_t& stack_value_low, uint8_t& stack_value_status, uint8_t& stack_pointer);
 }
 
 namespace stack_instructions {
@@ -64,7 +66,7 @@ namespace stack_instructions {
     void PullA(uint8_t stack_value, uint8_t& stack_pointer, uint8_t& a);
 
     void PushStatus(uint8_t& stack_value, uint8_t& stack_pointer, uint8_t status);
-    void PullStatus(uint8_t stack_value, uint8_t& stack_pointer, uint8_t& status);
+    void PullStatus(uint8_t stack_value, uint8_t& stack_pointer, uint8_t& status, InterruptServiceDelay& isd);
 
     void TransferX(uint8_t& stack_pointer, uint8_t x);
 }
