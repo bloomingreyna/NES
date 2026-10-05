@@ -1,7 +1,5 @@
 #include <cstdint>
 
-enum class StatusFlags;
-
 struct ALUresult;
 
 namespace alu_functions {

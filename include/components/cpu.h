@@ -1,12 +1,12 @@
 #include <cstdint>
 
-enum class StatusFlags {
-    CARRY = 0b00000001,
-    ZERO = 0b00000010,
-    INTERRUPT_DISABLE = 0b00000100,
-    DECIMAL = 0b00001000,
-    OVERFLOW = 0b01000000,
-    NEGATIVE = 0b10000000
+enum StatusFlags {
+    CARRY = 0,
+    ZERO = 1,
+    INTERRUPT_DISABLE = 2,
+    DECIMAL = 3,
+    OVERFLOW = 6,
+    NEGATIVE = 7
 };
 
 struct ALUresult {
