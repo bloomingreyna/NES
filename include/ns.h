@@ -1,5 +1,7 @@
 #include <cstdint>
 
+#include <components/cpu.h>
+
 struct ALUresult;
 
 namespace access_instructions {
@@ -44,6 +46,13 @@ namespace branch_instructions {
 namespace flag_instructions {
     void ClearFlag(uint8_t& status, StatusFlag flag);
     void SetFlag(uint8_t& status, StatusFlag flag);
+}
+
+namespace stack_instructions {
+    void Push(uint8_t& stack_value, uint8_t& stack_pointer, uint8_t reg);
+    void Pull(uint8_t stack_value, uint8_t& stack_pointer, uint8_t& reg);
+
+    void TransferX(uint8_t& stack_pointer, uint8_t x);
 }
 
 namespace transfer_instructions {
