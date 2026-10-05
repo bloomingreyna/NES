@@ -10,7 +10,10 @@ namespace alu_functions {
         ALUresult Decrement(uint8_t memory);
     }
     namespace bitwise {
-        ALUresult And(uint8_t accumulator, uint8_t memory);
+        ALUresult AND(uint8_t accumulator, uint8_t memory);
+        ALUresult OR(uint8_t accumulator, uint8_t memory);
+        ALUresult XOR(uint8_t accumulator, uint8_t memory);
+        ALUresult BitTest(uint8_t accumulator, uint8_t memory);
     }
 }
 

@@ -16,7 +16,7 @@ ALUresult alu_functions::arithmetic::AddWithCarry(uint8_t accumulator, uint8_t m
     return ALUresult{
         .result = static_cast<uint8_t>(result),
         .status = status,
-        .clear_mask = 0x0C
+        .clear_mask = 0xFF ^ (M_CARRY | M_ZERO | M_OVERFLOW | M_NEGATIVE)
     };
 }
 
@@ -30,7 +30,7 @@ ALUresult alu_functions::arithmetic::Increment(uint8_t memory) {
     return ALUresult{
         .result = static_cast<uint8_t>(result),
         .status = status,
-        .clear_mask = 0x82
+        .clear_mask = 0xFF ^ (M_ZERO | M_NEGATIVE)
     };
 }
 
@@ -44,6 +44,6 @@ ALUresult alu_functions::arithmetic::Decrement(uint8_t memory) {
     return ALUresult{
         .result = static_cast<uint8_t>(result),
         .status = status,
-        .clear_mask = 0x82
+        .clear_mask = 0xFF ^ (M_ZERO | M_NEGATIVE)
     };
 }
