@@ -33,6 +33,8 @@ PRIVATE
     src/ns/instructions/branch_instructions.cpp
     src/ns/instructions/stack_instructions.cpp
     src/ns/instructions/jump_instructions.cpp
+    include/components/address_bus.h
+    src/components/address_bus.cpp
 )
 
 target_include_directories(rbes
