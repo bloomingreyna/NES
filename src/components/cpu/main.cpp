@@ -14,9 +14,9 @@ CPU::CPU(AddressBus& _bus) : bus(_bus) {
     addressing_modes.at(ABSOLUTE) = [this]() { QueueAbsAddrMode(); };
     addressing_modes.at(ABSOLUTE_X) = [this]() { QueueAbsIndexedAddrMode(x_index); };
     addressing_modes.at(ABSOLUTE_Y) = [this]() { QueueAbsIndexedAddrMode(y_index); };
-    // addressing_modes.at(INDIRECT) = [this]() { QueueIndirectAddrMode(); };
-    // addressing_modes.at(INDIRECT_X) = [this]() { QueueIndirectXAddrMode(); };
-    // addressing_modes.at(INDIRECT_Y) = [this]() { QueueIndirectYAddrMode(); };
+    addressing_modes.at(INDIRECT) = [this]() { QueueIndirectAddrMode(); };
+    addressing_modes.at(INDIRECT_X) = [this]() { QueueIndirectXAddrMode(); };
+    addressing_modes.at(INDIRECT_Y) = [this]() { QueueIndirectYAddrMode(); };
 }
 
 void CPU::FetchInstruction() {

@@ -17,10 +17,10 @@ void CPU::QueueZeroPageAddrMode() {
 void CPU::QueueZeroPageIndexedAddrMode(uint8_t index) {
     task_queue.emplace([this, pc{program_counter}]() {
         byte_2 = bus.ReadMemory(pc + 1);
-        memory_store = bus.ReadMemory(byte_2);
     });
     task_queue.emplace([this, index]() {
-        memory_store += index;
+        byte_2 += index;
+        memory_store = bus.ReadMemory(byte_2);
     });
 }
 
@@ -38,6 +38,7 @@ void CPU::QueueAbsAddrMode() {
     });
 }
 
+// TODO: Fix always_oops check
 void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
     task_queue.emplace([this, pc{program_counter}]() {
         byte_2 = bus.ReadMemory(pc + 1);
@@ -65,5 +66,65 @@ void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
             (byte_3 << 8) | byte_2
         )};
         memory_store = bus.ReadMemory(address + index);
+    });
+}
+
+void CPU::QueueIndirectAddrMode() {
+    task_queue.emplace([this, pc{program_counter}]() {
+        byte_2 = bus.ReadMemory(pc + 1);
+    });
+    task_queue.emplace([this, pc{program_counter}]() {
+        byte_3 = bus.ReadMemory(pc + 2);
+    });
+    task_queue.emplace([this]() {
+        uint16_t ptr_address{static_cast<uint16_t>(
+            (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
+        )};
+        memory_store = bus.ReadMemory(ptr_address);
+    });
+}
+
+void CPU::QueueIndirectXAddrMode() {
+    task_queue.emplace([this, pc{program_counter}]() {
+        byte_2 = bus.ReadMemory(pc + 1);
+    });
+    task_queue.emplace([this]() {
+        byte_2 += x_index;
+    });
+    task_queue.emplace([this]() {
+        byte_3 = byte_2 + 1;
+    });
+    task_queue.emplace([this]() {
+        uint16_t ptr_address{static_cast<uint16_t>(
+            (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
+        )};
+        memory_store = bus.ReadMemory(ptr_address);
+    });
+}
+
+void CPU::QueueIndirectYAddrMode() {
+    task_queue.emplace([this, pc{program_counter}]() {
+        byte_2 = bus.ReadMemory(pc + 1);
+    });
+    task_queue.emplace([this]() {
+        byte_3 = byte_2 + 1;
+    });
+    task_queue.emplace([this]() {
+        ALUresult calc_low_byte{alu_functions::arithmetic::AddWithCarry(
+            bus.ReadMemory(byte_2),
+            y_index,
+            false
+        )};
+
+        uint16_t ptr_address{static_cast<uint16_t>(
+            (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(calc_low_byte.result)
+        )};
+        memory_store = bus.ReadMemory(ptr_address);
+    });
+    task_queue.emplace([this]() {
+        uint16_t ptr_address{static_cast<uint16_t>(
+            (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
+        )};
+        memory_store = bus.ReadMemory(ptr_address + y_index);
     });
 }
