@@ -38,7 +38,6 @@ void CPU::QueueAbsAddrMode() {
     });
 }
 
-// TODO: Fix always_oops check
 void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
     task_queue.emplace([this, pc{program_counter}]() {
         byte_2 = bus.ReadMemory(pc + 1);
@@ -57,8 +56,11 @@ void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
         )};
         memory_store = bus.ReadMemory(address);
 
-        if (!bit_manip::BitSet(calc_low_byte.status, CARRY)) {
-            task_queue.pop();
+        bool store_instruction{
+            opcode == STA_ABS_X || opcode == STA_ABS_Y
+        };
+        if (!store_instruction && !bit_manip::BitSet(calc_low_byte.status, CARRY)) {
+            task_queue.pop(); // Pops THIS task, instruction executor pops "oops" cycle.
         }
     });
     task_queue.emplace([this, index]() {

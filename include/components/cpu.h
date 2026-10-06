@@ -45,7 +45,15 @@ enum Opcode {
     ADC_ABS_X = 0x7D,
     ADC_ABS_Y = 0x79,
     ADC_IND_X = 0x61,
-    ADC_IND_Y = 0x71
+    ADC_IND_Y = 0x71,
+
+    STA_ZP = 0x85,
+    STA_ZP_X = 0x95,
+    STA_ABS = 0x8D,
+    STA_ABS_X = 0x9D,
+    STA_ABS_Y = 0x99,
+    STA_IND_X = 0x81,
+    STA_IND_Y = 0x91
 };
 
 struct ALUresult {
