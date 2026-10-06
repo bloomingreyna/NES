@@ -20,7 +20,7 @@ PRIVATE
     include/glfw3/glfw3.h
     include/glfw3/glfw3native.h
     include/components/cpu.h
-    src/components/cpu.cpp
+    src/components/cpu/main.cpp
     include/ns.h
     src/ns/bit_manip.cpp
     src/ns/alu_functions/arithmetic.cpp
@@ -35,6 +35,9 @@ PRIVATE
     src/ns/instructions/jump_instructions.cpp
     include/components/address_bus.h
     src/components/address_bus.cpp
+    src/components/cpu/addressing_modes.cpp
+    src/components/cpu/handlers.cpp
+    src/components/cpu/alu.cpp
 )
 
 target_include_directories(rbes
