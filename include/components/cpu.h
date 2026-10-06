@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <functional>
 #include <queue>
+#include <unordered_map>
 
 enum StatusFlag {
     CARRY = 0,
@@ -83,7 +84,7 @@ public:
     void QueryALU();
     void ALUstatusUpdate();
 
-    void ADChandler();
+    void QueueADC();
 private:
     AddressBus& bus;
 
@@ -93,6 +94,9 @@ private:
     uint8_t memory_store;
 
     std::array<std::function<void()>, MODE_COUNT> addressing_modes;
+
+    // Tentative size: 256
+    std::array<std::pair<AddressingMode, std::function<void()>>, 256> opcode_arr;
 
     ALUresult alu_result;
 

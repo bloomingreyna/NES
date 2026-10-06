@@ -17,10 +17,22 @@ CPU::CPU(AddressBus& _bus) : bus(_bus) {
     addressing_modes.at(INDIRECT) = [this]() { QueueIndirectAddrMode(); };
     addressing_modes.at(INDIRECT_X) = [this]() { QueueIndirectXAddrMode(); };
     addressing_modes.at(INDIRECT_Y) = [this]() { QueueIndirectYAddrMode(); };
+
+    opcode_arr.at(ADC_IMM) = {IMMEDIATE, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_ZP) = {ZERO_PAGE, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_ZP_X) = {ZERO_PAGE_X, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_ABS) = {ABSOLUTE, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_ABS_X) = {ABSOLUTE_X, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_ABS_Y) = {ABSOLUTE_Y, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_IND_X) = {INDIRECT_X, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_IND_Y) = {INDIRECT_Y, [this]() { QueueADC(); }};
 }
 
 void CPU::FetchInstruction() {
     opcode = static_cast<Opcode>(bus.ReadMemory(program_counter));
+    
+    addressing_modes.at(opcode_arr.at(opcode).first)();
+    opcode_arr.at(opcode).second();
 }
 
 void CPU::ExecuteInstruction() {

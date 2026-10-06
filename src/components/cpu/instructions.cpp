@@ -2,7 +2,7 @@
 #include <components/cpu.h>
 #include <ns.h>
 
-void CPU::ADChandler() {
+void CPU::QueueADC() {
     task_queue.emplace([this]() {
         alu_result = alu_functions::arithmetic::AddWithCarry(
             accumulator,
