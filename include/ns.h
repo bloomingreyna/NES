@@ -3,17 +3,11 @@
 
 #include <components/cpu.h>
 
-template <typename... Args>
-using cycle = std::function<void(Args...)>;
-
 struct ALUresult;
 
 namespace access_instructions {
-    namespace load {
-        cycle<uint8_t&, uint8_t> c1{[](uint8_t& reg, uint8_t memory_store) {
-            
-        }};
-    }
+    void Load(uint8_t& reg, uint8_t& status, uint8_t memory);
+    void Store(uint8_t reg, uint8_t& memory);
 }
 
 namespace alu_functions {
@@ -47,21 +41,37 @@ namespace bit_manip {
 }
 
 namespace branch_instructions {
-    
+    void Branch(uint16_t& pc, int8_t memory, bool condition);
 }
 
 namespace flag_instructions {
-    
+    void ClearFlag(uint8_t& status, StatusFlag flag);
+    void SetFlag(uint8_t& status, StatusFlag flag);
+
+    void ClearInterruptDisable(uint8_t& status, InterruptServiceDelay& isd);
+    void SetInterruptDisable(uint8_t& status, InterruptServiceDelay& isd);
 }
 
 namespace jump_instructions {
+    void Jump(uint16_t& program_counter, uint16_t memory);
+    void JumpToSubroutine(uint16_t& program_counter, uint16_t memory, uint8_t& stack_value_high, uint8_t& stack_value_low, uint8_t& stack_pointer);
     
+    void ReturnFromSubroutine(uint16_t& program_counter, uint8_t stack_value_high, uint8_t stack_value_low, uint8_t& stack_pointer);
+    void ReturnFromInterrupt(uint16_t& program_counter, uint8_t& status, bool& service_interrupts, uint8_t stack_value_high, uint8_t stack_value_low, uint8_t stack_value_status, uint8_t& stack_pointer);
+
+    void Break(uint16_t& program_counter, uint8_t& status, bool& service_interrupts, uint8_t& stack_value_high, uint8_t& stack_value_low, uint8_t& stack_value_status, uint8_t& stack_pointer);
 }
 
 namespace stack_instructions {
-    
+    void PushA(uint8_t& stack_value, uint8_t& stack_pointer, uint8_t a);
+    void PullA(uint8_t stack_value, uint8_t& stack_pointer, uint8_t& a);
+
+    void PushStatus(uint8_t& stack_value, uint8_t& stack_pointer, uint8_t status);
+    void PullStatus(uint8_t stack_value, uint8_t& stack_pointer, uint8_t& status, InterruptServiceDelay& isd);
+
+    void TransferX(uint8_t& stack_pointer, uint8_t x);
 }
 
 namespace transfer_instructions {
-    
+    void Transfer(uint8_t src_reg, uint8_t& dest_reg, uint8_t& status);
 }

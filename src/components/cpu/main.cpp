@@ -18,14 +18,14 @@ CPU::CPU(AddressBus& _bus) : bus(_bus) {
     addressing_modes.at(INDIRECT_X) = [this]() { QueueIndirectXAddrMode(); };
     addressing_modes.at(INDIRECT_Y) = [this]() { QueueIndirectYAddrMode(); };
 
-    opcode_arr.at(ADC_IMM) = {IMMEDIATE, [this]() { ADC(); }};
-    opcode_arr.at(ADC_ZP) = {ZERO_PAGE, [this]() { ADC(); }};
-    opcode_arr.at(ADC_ZP_X) = {ZERO_PAGE_X, [this]() { ADC(); }};
-    opcode_arr.at(ADC_ABS) = {ABSOLUTE, [this]() { ADC(); }};
-    opcode_arr.at(ADC_ABS_X) = {ABSOLUTE_X, [this]() { ADC(); }};
-    opcode_arr.at(ADC_ABS_Y) = {ABSOLUTE_Y, [this]() { ADC(); }};
-    opcode_arr.at(ADC_IND_X) = {INDIRECT_X, [this]() { ADC(); }};
-    opcode_arr.at(ADC_IND_Y) = {INDIRECT_Y, [this]() { ADC(); }};
+    opcode_arr.at(ADC_IMM) = {IMMEDIATE, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_ZP) = {ZERO_PAGE, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_ZP_X) = {ZERO_PAGE_X, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_ABS) = {ABSOLUTE, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_ABS_X) = {ABSOLUTE_X, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_ABS_Y) = {ABSOLUTE_Y, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_IND_X) = {INDIRECT_X, [this]() { QueueADC(); }};
+    opcode_arr.at(ADC_IND_Y) = {INDIRECT_Y, [this]() { QueueADC(); }};
 }
 
 void CPU::FetchInstruction() {
