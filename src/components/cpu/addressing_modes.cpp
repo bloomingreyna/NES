@@ -80,9 +80,12 @@ void CPU::QueueIndirectAddrMode() {
     });
     task_queue.emplace([this]() {
         uint16_t ptr_address{static_cast<uint16_t>(
-            (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
+            (byte_3 << 8) | byte_2
         )};
-        memory_store = bus.ReadMemory(ptr_address);
+        uint16_t address{static_cast<uint16_t>(
+            (bus.ReadMemory(ptr_address + 1) << 8) | bus.ReadMemory(ptr_address)
+        )};
+        memory_store = bus.ReadMemory(address);
     });
 }
 
@@ -97,10 +100,10 @@ void CPU::QueueIndirectXAddrMode() {
         byte_3 = byte_2 + 1;
     });
     task_queue.emplace([this]() {
-        uint16_t ptr_address{static_cast<uint16_t>(
+        uint16_t address{static_cast<uint16_t>(
             (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
         )};
-        memory_store = bus.ReadMemory(ptr_address);
+        memory_store = bus.ReadMemory(address);
     });
 }
 
@@ -118,15 +121,19 @@ void CPU::QueueIndirectYAddrMode() {
             false
         )};
 
-        uint16_t ptr_address{static_cast<uint16_t>(
-            (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(calc_low_byte.result)
+        uint16_t address{static_cast<uint16_t>(
+            (bus.ReadMemory(byte_3) << 8) | calc_low_byte.result
         )};
-        memory_store = bus.ReadMemory(ptr_address);
+        memory_store = bus.ReadMemory(address);
+
+        if (!bit_manip::BitSet(calc_low_byte.status, CARRY)) {
+            task_queue.pop(); // Pops THIS task, instruction executor pops "oops" cycle.
+        }
     });
     task_queue.emplace([this]() {
-        uint16_t ptr_address{static_cast<uint16_t>(
+        uint16_t address{static_cast<uint16_t>(
             (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
         )};
-        memory_store = bus.ReadMemory(ptr_address + y_index);
+        memory_store = bus.ReadMemory(address + y_index);
     });
 }
