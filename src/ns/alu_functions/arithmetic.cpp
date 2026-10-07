@@ -12,7 +12,7 @@ ALUresult alu_functions::arithmetic::AddWithCarry(uint8_t accumulator, uint8_t m
     bit_manip::SetBit(status, CARRY, result > 0xFF);
     bit_manip::SetBit(status, ZERO, (result & 0xFF) == 0x00);
     bit_manip::SetBit(status, OVERFLOW, ((result ^ accumulator) & (result ^ memory) & 0x80) != 0);
-    bit_manip::SetBit(status, NEGATIVE, bit_manip::BitSet(result, 7));
+    bit_manip::SetBit(status, NEGATIVE, bit_manip::BitSet(status, 7));
 
     return ALUresult{
         .result = static_cast<uint8_t>(result),

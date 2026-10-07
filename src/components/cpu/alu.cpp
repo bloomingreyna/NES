@@ -5,7 +5,7 @@ void CPU::QueryALU() {
     uint8_t mask{0xFF};
 }
 
-void CPU::ALUstatusUpdate(ALUresult alu_result) {
+void CPU::ALUstatusUpdate() {
     status_register &= alu_result.clear_mask;
     status_register |= alu_result.status;
 }
