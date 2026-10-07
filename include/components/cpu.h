@@ -40,21 +40,25 @@ enum AddressingMode {
 
 enum Opcode {
     ADC_IMM = 0x69,
-    ADC_ZP = 0x65,
-    ADC_ZP_X = 0x75,
-    ADC_ABS = 0x6D,
-    ADC_ABS_X = 0x7D,
-    ADC_ABS_Y = 0x79,
-    ADC_IND_X = 0x61,
-    ADC_IND_Y = 0x71,
+    ADC_ZP = 0x65, ADC_ZP_X = 0x75,
+    ADC_ABS = 0x6D, ADC_ABS_X = 0x7D, ADC_ABS_Y = 0x79,
+    ADC_IND_X = 0x61, ADC_IND_Y = 0x71,
 
-    STA_ZP = 0x85,
-    STA_ZP_X = 0x95,
-    STA_ABS = 0x8D,
-    STA_ABS_X = 0x9D,
-    STA_ABS_Y = 0x99,
-    STA_IND_X = 0x81,
-    STA_IND_Y = 0x91
+    AND_IMM = 0x29,
+    AND_ZP = 0x25, AND_ZP_X = 0x35,
+    AND_ABS = 0x2D, AND_ABS_X = 0x3D, AND_ABS_Y = 0x39,
+    AND_IND_X = 0x21, AND_IND_Y = 0x31,
+
+    // ...
+
+    BIT_ZP = 0x24,
+    BIT_ABS = 0x2C,
+
+    // ...
+
+    STA_ZP = 0x85, STA_ZP_X = 0x95,
+    STA_ABS = 0x8D, STA_ABS_X = 0x9D, STA_ABS_Y = 0x99,
+    STA_IND_X = 0x81, STA_IND_Y = 0x91
 };
 
 struct ALUresult {
@@ -82,9 +86,14 @@ public:
     void QueueIndirectYAddrMode();
 
     void QueryALU();
-    void ALUstatusUpdate();
+    void ALUstatusUpdate(ALUresult alu_result);
 
     void QueueADC();
+    void QueueAND();
+    void QueueASL();
+    void QueueBCC();
+    // ...
+    void QueueBIT();
 private:
     AddressBus& bus;
 
@@ -97,8 +106,6 @@ private:
 
     // Tentative size: 256
     std::array<std::pair<AddressingMode, std::function<void()>>, 256> opcode_arr;
-
-    ALUresult alu_result;
 
     uint8_t accumulator{};
     uint8_t status_register{};

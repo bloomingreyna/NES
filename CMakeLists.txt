@@ -5,12 +5,15 @@ project(
     VERSION 1.0
     LANGUAGES CXX
 )
+include(CTest)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
+
+find_package(glfw3 REQUIRED)
+find_package(OpenGL REQUIRED)
 
 add_executable(rbes)
 
@@ -50,11 +53,35 @@ PRIVATE
     lib
 )
 
-find_package(glfw3 REQUIRED)
-find_package(OpenGL REQUIRED)
-
 target_link_libraries(rbes
 PRIVATE
     glfw3
     OpenGL::GL
 )
+
+enable_testing()
+add_library(test_config INTERFACE)
+
+target_sources(test_config INTERFACE
+    include/ns.h
+    include/components/cpu.h
+)
+target_include_directories(test_config INTERFACE
+    include
+)
+target_link_directories(test_config INTERFACE
+    lib
+)
+target_link_libraries(test_config INTERFACE
+    glfw3
+    OpenGL::GL
+)
+
+add_executable(add_with_carry
+    tests/add_with_carry.cpp
+    src/ns/alu_functions/arithmetic.cpp
+    src/ns/bit_manip.cpp
+)
+target_link_libraries(add_with_carry PRIVATE test_config)
+
+add_test(NAME TestADC COMMAND add_with_carry)
