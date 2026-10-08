@@ -1,5 +1,4 @@
 #include <cstdint>
-#include <queue>
 
 #include <components/cpu.h>
 

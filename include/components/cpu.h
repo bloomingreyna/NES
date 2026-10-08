@@ -2,8 +2,6 @@
 
 #include <cstdint>
 #include <functional>
-#include <queue>
-#include <unordered_map>
 
 enum StatusFlag {
     CARRY = 0,
@@ -90,26 +88,32 @@ public:
     void QueryALU();
     void ALUstatusUpdate(ALUresult alu_result);
 
-    void ADC();
+    void AddWithCarry();
+    void IncrementMemory();
+    void IncrementIndex(uint8_t& index);
+
     void AND();
-    void ASL();
-    void BCC();
-    // ...
-    void BIT();
-    // ...
-    void BRK();
-    // ...
-    void CLC();
-    void CLD();
-    void CLI();
-    void CLV();
-    void CMP();
+    void BitTest();
+
+    void Compare(uint8_t reg);
+
+    void ArithmeticShiftLeft();
+
+    void BranchCarryClear();
+
+    void Break();
+
+    void ClearFlag(StatusFlag flag);
+    void SetFlag(StatusFlag flag);
 private:
     AddressBus& bus;
 
     Opcode opcode;
+
     uint8_t byte_2;
     uint8_t byte_3;
+
+    uint16_t address_store;
     uint8_t memory_store;
 
     std::array<std::function<void()>, MODE_COUNT> addressing_modes;
@@ -117,6 +121,7 @@ private:
     // Tentative size: 256
     std::array<std::pair<AddressingMode, std::function<void()>>, 256> opcode_arr;
     bool address_mode_complete{false};
+    bool instruction_complete{false};
     int current_internal_op{};
 
     uint8_t accumulator{};

@@ -1,9 +1,10 @@
+#include <components/address_bus.h>
 #include <components/cpu.h>
 #include <ns.h>
 
 void CPU::AND() {
     ALUresult alu_result{alu_functions::bitwise::AND(
-        accumulator, memory_store
+        accumulator, bus.ReadMemory(address_store)
     )};
     accumulator = alu_result.result;
     ALUstatusUpdate(alu_result);
@@ -11,9 +12,9 @@ void CPU::AND() {
     CompleteInstruction();
 }
 
-void CPU::BIT() {
+void CPU::BitTest() {
     ALUresult alu_result{alu_functions::bitwise::BitTest(
-        accumulator, memory_store
+        accumulator, bus.ReadMemory(address_store)
     )};
     ALUstatusUpdate(alu_result);
 

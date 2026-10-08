@@ -2,19 +2,21 @@
 #include <components/cpu.h>
 #include <ns.h>
 
+// Zero extra cycles
 void CPU::QueueImmediateAddrMode() {
-    memory_store = bus.ReadMemory(program_counter++);
+    address_store = program_counter++;
 
     address_mode_complete = true;
 }
 
+// One extra cycle
 void CPU::QueueZeroPageAddrMode() {
-    byte_2 = bus.ReadMemory(program_counter++);
-    memory_store = bus.ReadMemory(byte_2);
+    address_store = bus.ReadMemory(program_counter++);
 
     CompleteAddressMode();
 }
 
+// Two extra cycles
 void CPU::QueueZeroPageIndexedAddrMode(uint8_t index) {
     switch (current_internal_op) {
     case 0: {
@@ -23,7 +25,7 @@ void CPU::QueueZeroPageIndexedAddrMode(uint8_t index) {
     }
     case 1: {
         byte_2 += index;
-        memory_store = bus.ReadMemory(byte_2);
+        address_store = byte_2;
 
         CompleteAddressMode();
         break;
@@ -31,6 +33,7 @@ void CPU::QueueZeroPageIndexedAddrMode(uint8_t index) {
     }
 }
 
+// Two extra cycles
 void CPU::QueueAbsAddrMode() {
     switch (current_internal_op) {
     case 0: {
@@ -39,11 +42,7 @@ void CPU::QueueAbsAddrMode() {
     }
     case 1: {
         byte_3 = bus.ReadMemory(program_counter++);
-
-        uint16_t address{static_cast<uint16_t>(
-            (byte_3 << 8) | byte_2
-        )};
-        memory_store = bus.ReadMemory(address);
+        address_store = (byte_3 << 8) | byte_2;
 
         CompleteAddressMode();
         break;
@@ -51,6 +50,7 @@ void CPU::QueueAbsAddrMode() {
     }
 }
 
+// Two to three extra cycles
 void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
     switch (current_internal_op) {
     case 0: {
@@ -63,10 +63,7 @@ void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
         )};
         byte_3 = bus.ReadMemory(program_counter++);
 
-        uint16_t address{static_cast<uint16_t>(
-            (byte_3 << 8) | calc_low_byte.result
-        )};
-        memory_store = bus.ReadMemory(address);
+        address_store = (byte_3 << 8) | calc_low_byte.result;
 
         bool store_instruction{
             opcode == STA_ABS_X || opcode == STA_ABS_Y
@@ -78,10 +75,7 @@ void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
         break;
     }
     case 2: {
-        uint16_t address{static_cast<uint16_t>(
-            (byte_3 << 8) | byte_2
-        )};
-        memory_store = bus.ReadMemory(address + index);
+        address_store = ((byte_3 << 8) | byte_2) + index;
 
         CompleteAddressMode();
         break;
@@ -89,6 +83,7 @@ void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
     }
 }
 
+// Three extra cycles
 void CPU::QueueIndirectAddrMode() {
     switch (current_internal_op) {
     case 0: {
@@ -106,7 +101,7 @@ void CPU::QueueIndirectAddrMode() {
         uint16_t address{static_cast<uint16_t>(
             (bus.ReadMemory(ptr_address + 1) << 8) | bus.ReadMemory(ptr_address)
         )};
-        memory_store = bus.ReadMemory(address);
+        address_store = address;
 
         CompleteAddressMode();
         break;
@@ -114,6 +109,7 @@ void CPU::QueueIndirectAddrMode() {
     }
 }
 
+// Four extra cycles
 void CPU::QueueIndirectXAddrMode() {
     switch (current_internal_op) {
     case 0: {
@@ -132,7 +128,7 @@ void CPU::QueueIndirectXAddrMode() {
         uint16_t address{static_cast<uint16_t>(
             (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
         )};
-        memory_store = bus.ReadMemory(address);
+        address_store = address;
 
         CompleteAddressMode();
         break;
@@ -140,6 +136,7 @@ void CPU::QueueIndirectXAddrMode() {
     }
 }
 
+// Three to four extra cycles
 void CPU::QueueIndirectYAddrMode() {
     switch (current_internal_op) {
     case 0: {
@@ -158,7 +155,7 @@ void CPU::QueueIndirectYAddrMode() {
         uint16_t address{static_cast<uint16_t>(
             (bus.ReadMemory(byte_3) << 8) | calc_low_byte.result
         )};
-        memory_store = bus.ReadMemory(address);
+        address_store = address;
 
         bool store_instruction{
             opcode == STA_ABS_X || opcode == STA_ABS_Y
@@ -173,7 +170,7 @@ void CPU::QueueIndirectYAddrMode() {
         uint16_t address{static_cast<uint16_t>(
             (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
         )};
-        memory_store = bus.ReadMemory(address + y_index);
+        address_store = address + y_index;
 
         CompleteAddressMode();
         break;

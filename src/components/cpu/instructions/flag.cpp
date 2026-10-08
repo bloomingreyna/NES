@@ -1,22 +1,20 @@
 #include <components/cpu.h>
 #include <ns.h>
 
-void CPU::CLC() {
-    bit_manip::SetBit(status_register, CARRY, false);
+void CPU::ClearFlag(StatusFlag flag) {
+    bit_manip::SetBit(status_register, flag, false);
+    if (flag == INTERRUPT_DISABLE) {
+        isd = ISD_TRUE;
+    }
+
     CompleteInstruction();
 }
 
-void CPU::CLD() {
-    bit_manip::SetBit(status_register, DECIMAL, false);
-    CompleteInstruction();
-}
+void CPU::SetFlag(StatusFlag flag) {
+    bit_manip::SetBit(status_register, flag, true);
+    if (flag == INTERRUPT_DISABLE) {
+        isd = ISD_FALSE;
+    }
 
-void CPU::CLI() {
-    bit_manip::SetBit(status_register, INTERRUPT_DISABLE, false);
-    CompleteInstruction();
-}
-
-void CPU::CLV() {
-    bit_manip::SetBit(status_register, OVERFLOW, false);
     CompleteInstruction();
 }

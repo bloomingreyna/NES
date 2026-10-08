@@ -18,14 +18,14 @@ CPU::CPU(AddressBus& _bus) : bus(_bus) {
     addressing_modes.at(INDIRECT_X) = [this]() { QueueIndirectXAddrMode(); };
     addressing_modes.at(INDIRECT_Y) = [this]() { QueueIndirectYAddrMode(); };
 
-    opcode_arr.at(ADC_IMM) = {IMMEDIATE, [this]() { ADC(); }};
-    opcode_arr.at(ADC_ZP) = {ZERO_PAGE, [this]() { ADC(); }};
-    opcode_arr.at(ADC_ZP_X) = {ZERO_PAGE_X, [this]() { ADC(); }};
-    opcode_arr.at(ADC_ABS) = {ABSOLUTE, [this]() { ADC(); }};
-    opcode_arr.at(ADC_ABS_X) = {ABSOLUTE_X, [this]() { ADC(); }};
-    opcode_arr.at(ADC_ABS_Y) = {ABSOLUTE_Y, [this]() { ADC(); }};
-    opcode_arr.at(ADC_IND_X) = {INDIRECT_X, [this]() { ADC(); }};
-    opcode_arr.at(ADC_IND_Y) = {INDIRECT_Y, [this]() { ADC(); }};
+    opcode_arr.at(ADC_IMM) = {IMMEDIATE, [this]() { AddWithCarry(); }};
+    opcode_arr.at(ADC_ZP) = {ZERO_PAGE, [this]() { AddWithCarry(); }};
+    opcode_arr.at(ADC_ZP_X) = {ZERO_PAGE_X, [this]() { AddWithCarry(); }};
+    opcode_arr.at(ADC_ABS) = {ABSOLUTE, [this]() { AddWithCarry(); }};
+    opcode_arr.at(ADC_ABS_X) = {ABSOLUTE_X, [this]() { AddWithCarry(); }};
+    opcode_arr.at(ADC_ABS_Y) = {ABSOLUTE_Y, [this]() { AddWithCarry(); }};
+    opcode_arr.at(ADC_IND_X) = {INDIRECT_X, [this]() { AddWithCarry(); }};
+    opcode_arr.at(ADC_IND_Y) = {INDIRECT_Y, [this]() { AddWithCarry(); }};
 }
 
 void CPU::FetchInstruction() {
@@ -34,7 +34,7 @@ void CPU::FetchInstruction() {
 }
 
 void CPU::ExecuteInstruction() {
-    if (current_internal_op != -1) {
+    if (!instruction_complete) {
         AddressingMode mode{opcode_arr[opcode].first};
         std::function<void()> instruction{opcode_arr[opcode].second};
 
@@ -53,6 +53,7 @@ void CPU::ExecuteInstruction() {
         FetchInstruction();
         current_internal_op = 0;
         address_mode_complete = false;
+        instruction_complete = false;
     }
 }
 
@@ -62,5 +63,5 @@ void CPU::CompleteAddressMode() {
 }
 
 void CPU::CompleteInstruction() {
-    current_internal_op = -1;
+    instruction_complete = true;
 }

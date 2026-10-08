@@ -2,7 +2,7 @@
 #include <components/cpu.h>
 #include <ns.h>
 
-void CPU::BRK() {
+void CPU::Break() {
     switch (current_internal_op) {
     case 1: {
         bus.WriteToStack(stack_pointer--, program_counter >> 8);
@@ -29,6 +29,9 @@ void CPU::BRK() {
             (byte_3 << 8) | byte_2
         )};
         program_counter = interrupt_vector;
+
+        bit_manip::SetBit(status_register, INTERRUPT_DISABLE, true);
+        service_interrupts = false;
 
         CompleteInstruction();
         break;
