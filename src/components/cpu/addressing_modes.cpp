@@ -3,53 +3,65 @@
 #include <ns.h>
 
 void CPU::QueueImmediateAddrMode() {
-    byte_2 = bus.ReadMemory(program_counter + 1);
-    memory_store = byte_2;
+    memory_store = bus.ReadMemory(program_counter++);
+
+    address_mode_complete = true;
 }
 
 void CPU::QueueZeroPageAddrMode() {
-    task_queue.emplace([this, pc{program_counter}]() {
-        byte_2 = bus.ReadMemory(pc + 1);
-        memory_store = bus.ReadMemory(byte_2);
-    });
+    byte_2 = bus.ReadMemory(program_counter++);
+    memory_store = bus.ReadMemory(byte_2);
+
+    CompleteAddressMode();
 }
 
 void CPU::QueueZeroPageIndexedAddrMode(uint8_t index) {
-    task_queue.emplace([this, pc{program_counter}]() {
-        byte_2 = bus.ReadMemory(pc + 1);
-    });
-    task_queue.emplace([this, index]() {
+    switch (current_internal_op) {
+    case 0: {
+        byte_2 = bus.ReadMemory(program_counter++);
+        break;
+    }
+    case 1: {
         byte_2 += index;
         memory_store = bus.ReadMemory(byte_2);
-    });
+
+        CompleteAddressMode();
+        break;
+    }
+    }
 }
 
 void CPU::QueueAbsAddrMode() {
-    task_queue.emplace([this, pc{program_counter}]() {
-        byte_2 = bus.ReadMemory(pc + 1);
-    });
-    task_queue.emplace([this, pc{program_counter}]() {
-        byte_3 = bus.ReadMemory(pc + 2);
+    switch (current_internal_op) {
+    case 0: {
+        byte_2 = bus.ReadMemory(program_counter++);
+        break;
+    }
+    case 1: {
+        byte_3 = bus.ReadMemory(program_counter++);
 
         uint16_t address{static_cast<uint16_t>(
             (byte_3 << 8) | byte_2
         )};
         memory_store = bus.ReadMemory(address);
-    });
+
+        CompleteAddressMode();
+        break;
+    }
+    }
 }
 
 void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
-    task_queue.emplace([this, pc{program_counter}]() {
-        byte_2 = bus.ReadMemory(pc + 1);
-    });
-    task_queue.emplace([this, pc{program_counter}, index]() {
+    switch (current_internal_op) {
+    case 0: {
+        byte_2 = bus.ReadMemory(program_counter++);
+        break;
+    }
+    case 1: {
         ALUresult calc_low_byte{alu_functions::arithmetic::AddWithCarry(
-            byte_2,
-            index,
-            false
+            byte_2, index, false
         )};
-
-        byte_3 = bus.ReadMemory(pc + 2);
+        byte_3 = bus.ReadMemory(program_counter++);
 
         uint16_t address{static_cast<uint16_t>(
             (byte_3 << 8) | calc_low_byte.result
@@ -59,26 +71,35 @@ void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
         bool store_instruction{
             opcode == STA_ABS_X || opcode == STA_ABS_Y
         };
+
         if (!store_instruction && !bit_manip::BitSet(calc_low_byte.status, CARRY)) {
-            task_queue.pop(); // Pops THIS task, instruction executor pops "oops" cycle.
+            CompleteAddressMode();
         }
-    });
-    task_queue.emplace([this, index]() {
+        break;
+    }
+    case 2: {
         uint16_t address{static_cast<uint16_t>(
             (byte_3 << 8) | byte_2
         )};
         memory_store = bus.ReadMemory(address + index);
-    });
+
+        CompleteAddressMode();
+        break;
+    }
+    }
 }
 
 void CPU::QueueIndirectAddrMode() {
-    task_queue.emplace([this, pc{program_counter}]() {
-        byte_2 = bus.ReadMemory(pc + 1);
-    });
-    task_queue.emplace([this, pc{program_counter}]() {
-        byte_3 = bus.ReadMemory(pc + 2);
-    });
-    task_queue.emplace([this]() {
+    switch (current_internal_op) {
+    case 0: {
+        byte_2 = bus.ReadMemory(program_counter++);
+        break;
+    }
+    case 1: {
+        byte_3 = bus.ReadMemory(program_counter++);
+        break;
+    }
+    case 2: {
         uint16_t ptr_address{static_cast<uint16_t>(
             (byte_3 << 8) | byte_2
         )};
@@ -86,39 +107,52 @@ void CPU::QueueIndirectAddrMode() {
             (bus.ReadMemory(ptr_address + 1) << 8) | bus.ReadMemory(ptr_address)
         )};
         memory_store = bus.ReadMemory(address);
-    });
+
+        CompleteAddressMode();
+        break;
+    }
+    }
 }
 
 void CPU::QueueIndirectXAddrMode() {
-    task_queue.emplace([this, pc{program_counter}]() {
-        byte_2 = bus.ReadMemory(pc + 1);
-    });
-    task_queue.emplace([this]() {
+    switch (current_internal_op) {
+    case 0: {
+        byte_2 = bus.ReadMemory(program_counter++);
+        break;
+    }
+    case 1: {
         byte_2 += x_index;
-    });
-    task_queue.emplace([this]() {
+        break;
+    }
+    case 2: {
         byte_3 = byte_2 + 1;
-    });
-    task_queue.emplace([this]() {
+        break;
+    }
+    case 3: {
         uint16_t address{static_cast<uint16_t>(
             (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
         )};
         memory_store = bus.ReadMemory(address);
-    });
+
+        CompleteAddressMode();
+        break;
+    }
+    }
 }
 
 void CPU::QueueIndirectYAddrMode() {
-    task_queue.emplace([this, pc{program_counter}]() {
-        byte_2 = bus.ReadMemory(pc + 1);
-    });
-    task_queue.emplace([this]() {
+    switch (current_internal_op) {
+    case 0: {
+        byte_2 = bus.ReadMemory(program_counter++);
+        break;
+    }
+    case 1: {
         byte_3 = byte_2 + 1;
-    });
-    task_queue.emplace([this]() {
+        break;
+    }
+    case 2: {
         ALUresult calc_low_byte{alu_functions::arithmetic::AddWithCarry(
-            bus.ReadMemory(byte_2),
-            y_index,
-            false
+            bus.ReadMemory(byte_2), y_index, false
         )};
 
         uint16_t address{static_cast<uint16_t>(
@@ -126,14 +160,23 @@ void CPU::QueueIndirectYAddrMode() {
         )};
         memory_store = bus.ReadMemory(address);
 
-        if (!bit_manip::BitSet(calc_low_byte.status, CARRY)) {
-            task_queue.pop(); // Pops THIS task, instruction executor pops "oops" cycle.
+        bool store_instruction{
+            opcode == STA_ABS_X || opcode == STA_ABS_Y
+        };
+
+        if (!store_instruction && !bit_manip::BitSet(calc_low_byte.status, CARRY)) {
+            CompleteAddressMode();
         }
-    });
-    task_queue.emplace([this]() {
+        break;
+    }
+    case 3: {
         uint16_t address{static_cast<uint16_t>(
             (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
         )};
         memory_store = bus.ReadMemory(address + y_index);
-    });
+
+        CompleteAddressMode();
+        break;
+    }
+    }
 }

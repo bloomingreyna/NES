@@ -30,15 +30,37 @@ CPU::CPU(AddressBus& _bus) : bus(_bus) {
 
 void CPU::FetchInstruction() {
     opcode = static_cast<Opcode>(bus.ReadMemory(program_counter));
-    
-    addressing_modes.at(opcode_arr.at(opcode).first)();
-    opcode_arr.at(opcode).second();
+    program_counter++;
 }
 
 void CPU::ExecuteInstruction() {
-    if (!task_queue.empty()) {
-        task_queue.front()();
+    if (current_internal_op != -1) {
+        AddressingMode mode{opcode_arr[opcode].first};
+        std::function<void()> instruction{opcode_arr[opcode].second};
+
+        if (!address_mode_complete) {
+            addressing_modes[opcode_arr[opcode].first]();
+            if (mode == IMMEDIATE) {
+                current_internal_op++;
+                instruction();
+            }
+        } else if (address_mode_complete) {
+            instruction();
+        }
+
+        current_internal_op++;
     } else {
         FetchInstruction();
+        current_internal_op = 0;
+        address_mode_complete = false;
     }
+}
+
+void CPU::CompleteAddressMode() {
+    current_internal_op = 0;
+    address_mode_complete = true;
+}
+
+void CPU::CompleteInstruction() {
+    current_internal_op = -1;
 }

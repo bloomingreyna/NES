@@ -75,6 +75,8 @@ public:
 
     void FetchInstruction();
     void ExecuteInstruction();
+    void CompleteAddressMode();
+    void CompleteInstruction();
 
     void QueueImmediateAddrMode();
     void QueueZeroPageAddrMode();
@@ -106,6 +108,8 @@ private:
 
     // Tentative size: 256
     std::array<std::pair<AddressingMode, std::function<void()>>, 256> opcode_arr;
+    bool address_mode_complete{false};
+    int current_internal_op{};
 
     uint8_t accumulator{};
     uint8_t status_register{};
@@ -118,6 +122,4 @@ private:
 
     bool service_interrupts{false};
     InterruptServiceDelay isd{ISD_NONE};
-
-    std::queue<std::function<void()>> task_queue{};
 };
