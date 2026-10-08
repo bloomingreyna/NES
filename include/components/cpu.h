@@ -47,12 +47,12 @@ enum Opcode {
     AND_ABS = 0x2D, AND_ABS_X = 0x3D, AND_ABS_Y = 0x39,
     AND_IND_X = 0x21, AND_IND_Y = 0x31,
 
-    // ...
+    ASL_ACC = 0x6A,
 
     BIT_ZP = 0x24,
     BIT_ABS = 0x2C,
 
-    // ...
+    LSR_ACC = 0x4A,
 
     STA_ZP = 0x85, STA_ZP_X = 0x95,
     STA_ABS = 0x8D, STA_ABS_X = 0x9D, STA_ABS_Y = 0x99,
@@ -97,7 +97,10 @@ public:
 
     void Compare(uint8_t reg);
 
+    void ArithmeticShiftLeftAccumulator();
     void ArithmeticShiftLeft();
+    void LogicalShiftRightAccumulator();
+    void LogicalShiftRight();
 
     void BranchCarryClear();
 

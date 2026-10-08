@@ -27,12 +27,6 @@ PRIVATE
     src/ns/alu_functions/bitwise.cpp
     src/ns/alu_functions/shift.cpp
     src/ns/alu_functions/compare.cpp
-    src/ns/instructions/flag_instructions.cpp
-    src/ns/instructions/access_instructions.cpp
-    src/ns/instructions/transfer_instructions.cpp
-    src/ns/instructions/branch_instructions.cpp
-    src/ns/instructions/stack_instructions.cpp
-    src/ns/instructions/jump_instructions.cpp
     include/components/address_bus.h
     src/components/address_bus.cpp
     src/components/cpu/addressing_modes.cpp
@@ -42,6 +36,7 @@ PRIVATE
     src/components/cpu/instructions/jump.cpp
     src/components/cpu/instructions/flag.cpp
     src/components/cpu/instructions/compare.cpp
+    src/components/cpu/instructions/shift.cpp
 )
 
 target_include_directories(rbes
