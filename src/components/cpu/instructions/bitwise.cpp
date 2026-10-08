@@ -1,18 +1,7 @@
-#include <components/address_bus.h>
 #include <components/cpu.h>
 #include <ns.h>
 
-void CPU::QueueADC() {
-    ALUresult alu_result{alu_functions::arithmetic::AddWithCarry(
-        accumulator, memory_store, bit_manip::BitSet(status_register, CARRY)
-    )};
-    accumulator = alu_result.result;
-    ALUstatusUpdate(alu_result);
-
-    CompleteInstruction();
-}
-
-void CPU::QueueAND() {
+void CPU::AND() {
     ALUresult alu_result{alu_functions::bitwise::AND(
         accumulator, memory_store
     )};
@@ -22,9 +11,7 @@ void CPU::QueueAND() {
     CompleteInstruction();
 }
 
-// ...
-
-void CPU::QueueBIT() {
+void CPU::BIT() {
     ALUresult alu_result{alu_functions::bitwise::BitTest(
         accumulator, memory_store
     )};

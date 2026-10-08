@@ -90,12 +90,20 @@ public:
     void QueryALU();
     void ALUstatusUpdate(ALUresult alu_result);
 
-    void QueueADC();
-    void QueueAND();
-    void QueueASL();
-    void QueueBCC();
+    void ADC();
+    void AND();
+    void ASL();
+    void BCC();
     // ...
-    void QueueBIT();
+    void BIT();
+    // ...
+    void BRK();
+    // ...
+    void CLC();
+    void CLD();
+    void CLI();
+    void CLV();
+    void CMP();
 private:
     AddressBus& bus;
 

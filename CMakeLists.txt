@@ -36,8 +36,12 @@ PRIVATE
     include/components/address_bus.h
     src/components/address_bus.cpp
     src/components/cpu/addressing_modes.cpp
-    src/components/cpu/instructions.cpp
     src/components/cpu/alu.cpp
+    src/components/cpu/instructions/arithmetic.cpp
+    src/components/cpu/instructions/bitwise.cpp
+    src/components/cpu/instructions/jump.cpp
+    src/components/cpu/instructions/flag.cpp
+    src/components/cpu/instructions/compare.cpp
 )
 
 target_include_directories(rbes
