@@ -101,6 +101,10 @@ public:
     void ArithmeticShiftLeft();
     void LogicalShiftRightAccumulator();
     void LogicalShiftRight();
+    void RotateLeftAccumulator();
+    void RotateLeft();
+    void RotateRightAccumulator();
+    void RotateRight();
 
     void BranchCarryClear();
 
