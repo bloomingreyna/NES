@@ -1,34 +1,35 @@
-#include <components/address_bus.h>
+#include <components/memory_bus.h>
 #include <components/cpu.h>
 #include <ns.h>
 
 void CPU::Break() {
     switch (current_internal_op) {
-    case 1: {
-        bus.WriteToStack(stack_pointer--, program_counter >> 8);
-        break;
-    }
+    case 1: break; // Dummy read
     case 2: {
-        bus.WriteToStack(stack_pointer--, program_counter & 0xFF);
+        rw_signal = WRITE;
+
+        data_bus = program_counter >> 8;
+        address_bus = 0x0100 + stack_pointer--;
         break;
     }
     case 3: {
-        bus.WriteToStack(stack_pointer--, status_register | 0b00110000);
+        data_bus = program_counter & 0xFF;
+        address_bus = 0x0100 + stack_pointer--;
         break;
     }
     case 4: {
-        byte_2 = bus.ReadMemory(0xFFFE);
+        data_bus = status_register | 0b00110000;
+        address_bus = 0x0100 + stack_pointer--;
         break;
     }
     case 5: {
-        byte_3 = bus.ReadMemory(0xFFFF);
+        rw_signal = READ;
+
+        program_counter = bus.ReadMemory(0xFFFE);
         break;
     }
     case 6: {
-        uint16_t interrupt_vector{static_cast<uint16_t>(
-            (byte_3 << 8) | byte_2
-        )};
-        program_counter = interrupt_vector;
+        program_counter |= bus.ReadMemory(0xFFFF) << 8;
 
         bit_manip::SetBit(status_register, INTERRUPT_DISABLE, true);
         service_interrupts = false;

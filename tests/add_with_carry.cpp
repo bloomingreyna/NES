@@ -41,7 +41,7 @@ int main() {
         uint8_t expected_result{std::get<3>(current_test)};
         uint8_t expected_status{std::get<4>(current_test)};
 
-        ALUresult result{alu_functions::arithmetic::AddWithCarry(
+        ALU result{alu_functions::arithmetic::AddWithCarry(
             accumulator, memory, carry
         )};
 

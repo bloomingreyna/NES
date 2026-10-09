@@ -1,17 +1,17 @@
-#include <components/address_bus.h>
+#include <components/memory_bus.h>
 #include <components/cpu.h>
 #include <ns.h>
 
 // Zero extra cycles
 void CPU::QueueImmediateAddrMode() {
-    address_store = program_counter++;
+    address_bus = program_counter++;
 
     address_mode_complete = true;
 }
 
 // One extra cycle
 void CPU::QueueZeroPageAddrMode() {
-    address_store = bus.ReadMemory(program_counter++);
+    address_bus = bus.ReadMemory(program_counter++);
 
     CompleteAddressMode();
 }
@@ -20,12 +20,12 @@ void CPU::QueueZeroPageAddrMode() {
 void CPU::QueueZeroPageIndexedAddrMode(uint8_t index) {
     switch (current_internal_op) {
     case 0: {
-        byte_2 = bus.ReadMemory(program_counter++);
+        address_bus = bus.ReadMemory(program_counter++);
         break;
     }
     case 1: {
-        byte_2 += index;
-        address_store = byte_2;
+        address_bus += index;
+        address_bus &= 0xFF;
 
         CompleteAddressMode();
         break;
@@ -37,12 +37,11 @@ void CPU::QueueZeroPageIndexedAddrMode(uint8_t index) {
 void CPU::QueueAbsAddrMode() {
     switch (current_internal_op) {
     case 0: {
-        byte_2 = bus.ReadMemory(program_counter++);
+        address_bus = bus.ReadMemory(program_counter++);
         break;
     }
     case 1: {
-        byte_3 = bus.ReadMemory(program_counter++);
-        address_store = (byte_3 << 8) | byte_2;
+        address_bus |= bus.ReadMemory(program_counter++) << 8;
 
         CompleteAddressMode();
         break;
@@ -54,28 +53,28 @@ void CPU::QueueAbsAddrMode() {
 void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
     switch (current_internal_op) {
     case 0: {
-        byte_2 = bus.ReadMemory(program_counter++);
+        address_bus = bus.ReadMemory(program_counter++);
         break;
     }
     case 1: {
-        ALUresult calc_low_byte{alu_functions::arithmetic::AddWithCarry(
-            byte_2, index, false
-        )};
-        byte_3 = bus.ReadMemory(program_counter++);
+        address_bus |= bus.ReadMemory(program_counter++) << 8;
 
-        address_store = (byte_3 << 8) | calc_low_byte.result;
+        alu = alu_functions::arithmetic::AddWithCarry(
+            address_bus & 0xFF, index, false
+        );
 
         bool store_instruction{
             opcode == STA_ABS_X || opcode == STA_ABS_Y
         };
 
-        if (!store_instruction && !bit_manip::BitSet(calc_low_byte.status, CARRY)) {
+        if (!store_instruction && !bit_manip::BitSet(alu.status, CARRY)) {
+            address_bus = (address_bus & 0xFF) | alu.result;
             CompleteAddressMode();
         }
         break;
     }
     case 2: {
-        address_store = ((byte_3 << 8) | byte_2) + index;
+        address_bus += index;
 
         CompleteAddressMode();
         break;
@@ -83,25 +82,25 @@ void CPU::QueueAbsIndexedAddrMode(uint8_t index) {
     }
 }
 
-// Three extra cycles
+// Four extra cycles
 void CPU::QueueIndirectAddrMode() {
     switch (current_internal_op) {
     case 0: {
-        byte_2 = bus.ReadMemory(program_counter++);
+        address_bus = bus.ReadMemory(program_counter++);
         break;
     }
     case 1: {
-        byte_3 = bus.ReadMemory(program_counter++);
+        address_bus |= bus.ReadMemory(program_counter++) << 8;
         break;
     }
     case 2: {
-        uint16_t ptr_address{static_cast<uint16_t>(
-            (byte_3 << 8) | byte_2
-        )};
-        uint16_t address{static_cast<uint16_t>(
-            (bus.ReadMemory(ptr_address + 1) << 8) | bus.ReadMemory(ptr_address)
-        )};
-        address_store = address;
+        internal_addr_latch = bus.ReadMemory(address_bus);
+        address_bus = (address_bus & 0xFF00) | ((address_bus + 1) & 0xFF);
+
+        break;
+    }
+    case 3: {
+        address_bus = (bus.ReadMemory(address_bus) << 8) | internal_addr_latch;
 
         CompleteAddressMode();
         break;
@@ -113,22 +112,22 @@ void CPU::QueueIndirectAddrMode() {
 void CPU::QueueIndirectXAddrMode() {
     switch (current_internal_op) {
     case 0: {
-        byte_2 = bus.ReadMemory(program_counter++);
+        address_bus = bus.ReadMemory(program_counter++);
         break;
     }
     case 1: {
-        byte_2 += x_index;
+        address_bus += x_index;
+        address_bus &= 0xFF;
         break;
     }
     case 2: {
-        byte_3 = byte_2 + 1;
+        internal_addr_latch = bus.ReadMemory(address_bus);
+        address_bus++;
+        address_bus &= 0xFF;
         break;
     }
     case 3: {
-        uint16_t address{static_cast<uint16_t>(
-            (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
-        )};
-        address_store = address;
+        address_bus = (bus.ReadMemory(address_bus) << 8) | internal_addr_latch;
 
         CompleteAddressMode();
         break;
@@ -140,37 +139,34 @@ void CPU::QueueIndirectXAddrMode() {
 void CPU::QueueIndirectYAddrMode() {
     switch (current_internal_op) {
     case 0: {
-        byte_2 = bus.ReadMemory(program_counter++);
+        address_bus = bus.ReadMemory(program_counter++);
         break;
     }
     case 1: {
-        byte_3 = byte_2 + 1;
+        internal_addr_latch = bus.ReadMemory(address_bus);
+        address_bus++;
+        address_bus &= 0xFF;
         break;
     }
     case 2: {
-        ALUresult calc_low_byte{alu_functions::arithmetic::AddWithCarry(
-            bus.ReadMemory(byte_2), y_index, false
-        )};
+        address_bus = (bus.ReadMemory(address_bus) << 8) | internal_addr_latch;
 
-        uint16_t address{static_cast<uint16_t>(
-            (bus.ReadMemory(byte_3) << 8) | calc_low_byte.result
-        )};
-        address_store = address;
+        alu = alu_functions::arithmetic::AddWithCarry(
+            address_bus & 0xFF, y_index, false
+        );
 
         bool store_instruction{
             opcode == STA_ABS_X || opcode == STA_ABS_Y
         };
 
-        if (!store_instruction && !bit_manip::BitSet(calc_low_byte.status, CARRY)) {
+        if (!store_instruction && !bit_manip::BitSet(alu.status, CARRY)) {
+            address_bus = (address_bus & 0xFF) | alu.result;
             CompleteAddressMode();
         }
         break;
     }
     case 3: {
-        uint16_t address{static_cast<uint16_t>(
-            (bus.ReadMemory(byte_3) << 8) | bus.ReadMemory(byte_2)
-        )};
-        address_store = address + y_index;
+        address_bus += y_index;
 
         CompleteAddressMode();
         break;

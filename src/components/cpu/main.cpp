@@ -2,11 +2,11 @@
 #include <functional>
 #include <unordered_set>
 
-#include <components/address_bus.h>
+#include <components/memory_bus.h>
 #include <components/cpu.h>
 #include <ns.h>
 
-CPU::CPU(AddressBus& _bus) : bus(_bus) {
+CPU::CPU(MemoryBus& _bus) : bus(_bus) {
     addressing_modes.at(IMMEDIATE) = [this]() { QueueImmediateAddrMode(); };
     addressing_modes.at(ZERO_PAGE) = [this]() { QueueZeroPageAddrMode(); };
     addressing_modes.at(ZERO_PAGE_X) = [this]() { QueueZeroPageIndexedAddrMode(x_index); };
@@ -55,6 +55,17 @@ void CPU::ExecuteInstruction() {
         address_mode_complete = false;
         instruction_complete = false;
     }
+
+    switch (rw_signal) {
+        case READ: {
+            data_bus = bus.ReadMemory(address_bus);
+            break;
+        }
+        case WRITE: {
+            bus.WriteMemory(address_bus, data_bus);
+            break;
+        }
+    }
 }
 
 void CPU::CompleteAddressMode() {
@@ -64,4 +75,5 @@ void CPU::CompleteAddressMode() {
 
 void CPU::CompleteInstruction() {
     instruction_complete = true;
+    rw_signal = READ;
 }

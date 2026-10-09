@@ -1,7 +1,7 @@
 #include <components/cpu.h>
 #include <ns.h>
 
-ALUresult alu_functions::shift::ArithmeticShiftLeft(uint8_t value) {
+ALU alu_functions::shift::ArithmeticShiftLeft(uint8_t value) {
     uint8_t result{static_cast<uint8_t>(
         value << 1
     )};
@@ -11,14 +11,14 @@ ALUresult alu_functions::shift::ArithmeticShiftLeft(uint8_t value) {
     bit_manip::SetBit(status, ZERO, result == 0);
     bit_manip::SetBit(status, NEGATIVE, bit_manip::BitSet(result, 7));
 
-    return ALUresult{
+    return ALU{
         .result = result,
         .status = status,
         .clear_mask = 0xFF ^ (M_CARRY | M_ZERO | M_NEGATIVE)
     };
 }
 
-ALUresult alu_functions::shift::LogicalShiftRight(uint8_t value) {
+ALU alu_functions::shift::LogicalShiftRight(uint8_t value) {
     uint8_t result{static_cast<uint8_t>(
         value >> 1
     )};
@@ -28,14 +28,14 @@ ALUresult alu_functions::shift::LogicalShiftRight(uint8_t value) {
     bit_manip::SetBit(status, ZERO, result == 0);
     bit_manip::SetBit(status, NEGATIVE, false);
 
-    return ALUresult{
+    return ALU{
         .result = result,
         .status = status,
         .clear_mask = 0xFF ^ (M_CARRY | M_ZERO | M_NEGATIVE)
     };
 }
 
-ALUresult alu_functions::shift::RotateLeft(uint8_t value, bool carry) {
+ALU alu_functions::shift::RotateLeft(uint8_t value, bool carry) {
     uint8_t shifted_value{static_cast<uint8_t>(
         value << 1
     )};
@@ -48,14 +48,14 @@ ALUresult alu_functions::shift::RotateLeft(uint8_t value, bool carry) {
     bit_manip::SetBit(status, ZERO, result == 0);
     bit_manip::SetBit(status, NEGATIVE, bit_manip::BitSet(result, 7));
 
-    return ALUresult{
+    return ALU{
         .result = result,
         .status = status,
         .clear_mask = 0xFF ^ (M_CARRY | M_ZERO | M_NEGATIVE)
     };
 }
 
-ALUresult alu_functions::shift::RotateRight(uint8_t value, bool carry) {
+ALU alu_functions::shift::RotateRight(uint8_t value, bool carry) {
     uint8_t shifted_value{static_cast<uint8_t>(
         value >> 1
     )};
@@ -71,7 +71,7 @@ ALUresult alu_functions::shift::RotateRight(uint8_t value, bool carry) {
     bit_manip::SetBit(status, ZERO, result == 0);
     bit_manip::SetBit(status, NEGATIVE, bit_manip::BitSet(result, 7));
 
-    return ALUresult{
+    return ALU{
         .result = result,
         .status = status,
         .clear_mask = 0xFF ^ (M_CARRY | M_ZERO | M_NEGATIVE)

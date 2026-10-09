@@ -1,8 +1,10 @@
+#pragma once
+
 #include <cstdint>
 
 #include <components/cpu.h>
 
-struct ALUresult;
+struct ALU;
 
 namespace access_instructions {
     void Load(uint8_t& reg, uint8_t& status, uint8_t memory);
@@ -12,25 +14,25 @@ namespace access_instructions {
 namespace alu_functions {
     namespace arithmetic {
         // Internally, SBC is implemented via ADC and inverting the memory.
-        ALUresult AddWithCarry(uint8_t accumulator, uint8_t memory, bool carry);
+        ALU AddWithCarry(uint8_t accumulator, uint8_t memory, bool carry);
 
-        ALUresult Increment(uint8_t memory);
-        ALUresult Decrement(uint8_t memory);
+        ALU Increment(uint8_t memory);
+        ALU Decrement(uint8_t memory);
     }
     namespace bitwise {
-        ALUresult AND(uint8_t accumulator, uint8_t memory);
-        ALUresult OR(uint8_t accumulator, uint8_t memory);
-        ALUresult XOR(uint8_t accumulator, uint8_t memory);
-        ALUresult BitTest(uint8_t accumulator, uint8_t memory);
+        ALU AND(uint8_t accumulator, uint8_t memory);
+        ALU OR(uint8_t accumulator, uint8_t memory);
+        ALU XOR(uint8_t accumulator, uint8_t memory);
+        ALU BitTest(uint8_t accumulator, uint8_t memory);
     }
     namespace compare {
-        ALUresult Compare(uint8_t reg, uint8_t memory);
+        ALU Compare(uint8_t reg, uint8_t memory);
     }
     namespace shift {
-        ALUresult ArithmeticShiftLeft(uint8_t value);
-        ALUresult LogicalShiftRight(uint8_t value);
-        ALUresult RotateLeft(uint8_t value, bool carry);
-        ALUresult RotateRight(uint8_t value, bool carry);
+        ALU ArithmeticShiftLeft(uint8_t value);
+        ALU LogicalShiftRight(uint8_t value);
+        ALU RotateLeft(uint8_t value, bool carry);
+        ALU RotateRight(uint8_t value, bool carry);
     }
 }
 

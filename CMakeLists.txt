@@ -27,8 +27,8 @@ PRIVATE
     src/ns/alu_functions/bitwise.cpp
     src/ns/alu_functions/shift.cpp
     src/ns/alu_functions/compare.cpp
-    include/components/address_bus.h
-    src/components/address_bus.cpp
+    include/components/memory_bus.h
+    src/components/memory_bus.cpp
     src/components/cpu/addressing_modes.cpp
     src/components/cpu/alu.cpp
     src/components/cpu/instructions/arithmetic.cpp

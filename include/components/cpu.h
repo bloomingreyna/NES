@@ -59,17 +59,21 @@ enum Opcode {
     STA_IND_X = 0x81, STA_IND_Y = 0x91
 };
 
-struct ALUresult {
+enum RWsignal {
+    READ, WRITE
+};
+
+struct ALU {
     uint8_t result{};
     uint8_t status{};
     uint8_t clear_mask{};
 };
 
-class AddressBus;
+class MemoryBus;
 
 class CPU {
 public:
-    CPU(AddressBus& _bus);
+    CPU(MemoryBus& _bus);
 
     void FetchInstruction();
     void ExecuteInstruction();
@@ -86,7 +90,7 @@ public:
     void QueueIndirectYAddrMode();
 
     void QueryALU();
-    void ALUstatusUpdate(ALUresult alu_result);
+    void ALUstatusUpdate(ALU alu);
 
     void AddWithCarry();
     void IncrementMemory();
@@ -113,15 +117,19 @@ public:
     void ClearFlag(StatusFlag flag);
     void SetFlag(StatusFlag flag);
 private:
-    AddressBus& bus;
+    MemoryBus& bus;
+    ALU alu;
 
     Opcode opcode;
 
     uint8_t byte_2;
     uint8_t byte_3;
 
-    uint16_t address_store;
-    uint8_t memory_store;
+    uint8_t internal_addr_latch; // Used for absolute indirect addressing
+    uint16_t address_bus;
+
+    RWsignal rw_signal{READ};
+    uint8_t data_bus;
 
     std::array<std::function<void()>, MODE_COUNT> addressing_modes;
 
